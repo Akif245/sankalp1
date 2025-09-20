@@ -1,129 +1,3 @@
-# from flask import Flask, request, jsonify, send_from_directory
-# import os
-# import requests
-# from dotenv import load_dotenv
-
-# # Load .env file
-# load_dotenv()
-
-# app = Flask(__name__, static_folder="static")
-
-# # API configuration - Using OpenRouter as free alternative
-# OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-# OPENROUTER_API_URL = os.getenv("OPENROUTER_API_URL", "https://openrouter.ai/api/v1/chat/completions")
-
-# def call_ai_api(prompt, system_message=None):
-#     """Call AI API with the given prompt (using OpenRouter)"""
-#     headers = {
-#         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-#         "Content-Type": "application/json",
-#         "HTTP-Referer": "http://localhost:5000",  # Required by OpenRouter
-#         "X-Title": "AI Course Generator"  # Required by OpenRouter
-#     }
-    
-#     messages = []
-#     if system_message:
-#         messages.append({"role": "system", "content": system_message})
-#     messages.append({"role": "user", "content": prompt})
-    
-#     payload = {
-#         "model": "deepseek/deepseek-chat",  # Using DeepSeek through OpenRouter
-#         "messages": messages,
-#         "temperature": 0.7,
-#         "max_tokens": 2048
-#     }
-    
-#     try:
-#         response = requests.post(OPENROUTER_API_URL, headers=headers, json=payload)
-#         response.raise_for_status()
-#         result = response.json()
-#         return result['choices'][0]['message']['content']
-#     except requests.exceptions.HTTPError as e:
-#         if response.status_code == 402:
-#             return fallback_response(prompt, system_message)
-#         raise Exception(f"API error: {str(e)}")
-#     except Exception as e:
-#         raise Exception(f"API error: {str(e)}")
-
-# def fallback_response(prompt, system_message=None):
-#     """Fallback response when API is not available"""
-#     if "course outline" in prompt.lower():
-#         topic = prompt.split("topic:")[-1].split(".")[0].strip()
-#         return f"""# {topic.title()} Course Outline
-
-# ## Module 1: Introduction to {topic}
-# - Basic concepts and terminology
-# - Historical background
-# - Importance and applications
-
-# ## Module 2: Core Principles
-# - Fundamental theories
-# - Key methodologies
-# - Practical examples
-
-# ## Module 3: Advanced Topics
-# - Complex concepts
-# - Real-world applications
-# - Case studies
-
-# ## Module 4: Practical Implementation
-# - Hands-on exercises
-# - Project work
-# - Best practices
-
-# ## Assessment
-# - Quizzes and tests
-# - Final project
-# - Certification criteria
-
-# *Note: This is a sample outline. For a detailed course, please add credits to your API account.*"""
-#     else:
-#         return f"I'd be happy to help with that question. However, the AI service requires credits to provide detailed answers. Please add credits to your API account for full functionality. Meanwhile, you might want to research: {prompt}"
-
-# # Serve index.html
-# @app.route("/")
-# def home():
-#     return send_from_directory(".", "index.html")
-
-# # Course generation endpoint
-# @app.route("/generate_course", methods=["POST"])
-# def generate_course():
-#     data = request.get_json()
-#     topic = data.get("topic", "")
-
-#     if not topic:
-#         return jsonify({"error": "No topic provided"}), 400
-
-#     try:
-#         prompt = f"Create a clear, structured study course outline for the topic: {topic}. Keep it simple, organized with bullet points or numbered steps."
-#         system_message = "You are an educational content creator. Provide structured, easy-to-follow course outlines."
-        
-#         response = call_ai_api(prompt, system_message)
-#         return jsonify({"course": response.strip()})
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-# # AI Professor Q&A endpoint
-# @app.route("/ask_professor", methods=["POST"])
-# def ask_professor():
-#     data = request.get_json()
-#     question = data.get("question", "")
-
-#     if not question:
-#         return jsonify({"error": "No question provided"}), 400
-
-#     try:
-#         prompt = f"Give a clear, exam-oriented answer to this question: {question}. Keep the explanation structured, educational, and easy for students to understand."
-#         system_message = "You are a knowledgeable study professor. Provide clear, educational answers to student questions."
-        
-#         response = call_ai_api(prompt, system_message)
-#         return jsonify({"answer": response.strip()})
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
 from flask import Flask, request, jsonify, send_from_directory
 import os
 import requests
@@ -181,7 +55,7 @@ def home():
 def generate_course():
     data = request.get_json()
     topic = data.get("topic", "")
-    student_id = data.get("student_id", "anonymous")  # Simple user tracking
+    student_id = data.get("student_id", "anonymous")
 
     if not topic:
         return jsonify({"error": "No topic provided"}), 400
@@ -364,5 +238,87 @@ def get_progress():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
+# Explain concept endpoint
+@app.route("/explain_concept", methods=["POST"])
+def explain_concept():
+    data = request.get_json()
+    topic = data.get("topic", "")
+
+    if not topic:
+        return jsonify({"error": "No topic provided"}), 400
+
+    try:
+        prompt = f"Explain the core concepts of {topic} in a simple, engaging way suitable for students. Break it down into fundamental principles and provide clear examples."
+        system_message = "You are an engaging professor who explains concepts clearly with practical examples. Use analogies and simple language."
+        
+        response = call_ai_api(prompt, system_message)
+        return jsonify({"explanation": response.strip()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Give example endpoint
+@app.route("/give_example", methods=["POST"])
+def give_example():
+    data = request.get_json()
+    topic = data.get("topic", "")
+
+    if not topic:
+        return jsonify({"error": "No topic provided"}), 400
+
+    try:
+        prompt = f"Provide a practical, real-world example of {topic}. Make it engaging and educational, showing how this concept applies in practice."
+        system_message = "You are a professor who provides excellent real-world examples that help students understand abstract concepts."
+        
+        response = call_ai_api(prompt, system_message)
+        return jsonify({"example": response.strip()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Summarize topic endpoint
+@app.route("/summarize_topic", methods=["POST"])
+def summarize_topic():
+    data = request.get_json()
+    topic = data.get("topic", "")
+
+    if not topic:
+        return jsonify({"error": "No topic provided"}), 400
+
+    try:
+        prompt = f"Create a concise but comprehensive summary of {topic}. Highlight the key points, main concepts, and most important takeaways for students."
+        system_message = "You are a professor who creates excellent summaries that help students review and remember key information."
+        
+        response = call_ai_api(prompt, system_message)
+        return jsonify({"summary": response.strip()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Interactive video lessons endpoint (simulated)
+@app.route("/get_video_lesson", methods=["POST"])
+def get_video_lesson():
+    data = request.get_json()
+    topic = data.get("topic", "")
+    module = data.get("module", "")
+
+    if not topic:
+        return jsonify({"error": "No topic provided"}), 400
+
+    try:
+        # In a real implementation, you would have actual video URLs
+        # For now, we'll generate a simulated lesson script
+        prompt = f"Create an interactive video lesson script for {module} in the course about {topic}. Include explanations, examples, and engaging questions for students."
+        system_message = "You are a video lesson creator who makes engaging educational content with clear explanations and interactive elements."
+        
+        response = call_ai_api(prompt, system_message)
+        
+        # Simulate a video response (in a real app, you'd return actual video URLs)
+        return jsonify({
+            "lesson_script": response.strip(),
+            "video_url": f"/static/videos/{topic}_{module}.mp4",  # This would be a real URL
+            "duration": "15:30",
+            "title": f"Interactive Lesson: {module}"
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":      
     app.run(debug=True)
