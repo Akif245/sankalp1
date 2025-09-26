@@ -1,1225 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Course Generator</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-    :root {
-      --primary: #4361ee;
-      --secondary: #3a0ca3;
-      --accent: #7209b7;
-      --light: #f8f9fa;
-      --dark: #212529;
-      --error: #e63946;
-      --complete: #4caf50;
-      --gradient-start: #4361ee;
-      --gradient-end: #3a0ca3;
-    }
-
-    * {
-      transition: all 0.3s ease;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      padding: 20px;
-      animation: gradientShift 15s ease infinite;
-      background-size: 200% 200%;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .container {
-      max-width: 1000px;
-    }
-
-    .custom-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      padding: 35px;
-      margin-bottom: 25px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transform: translateY(0);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .custom-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
-    }
-
-    .header-icon {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      color: var(--primary);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .error {
-      color: var(--error);
-      background: rgba(230, 57, 70, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      text-align: center;
-      border-left: 4px solid var(--error);
-      animation: shake 0.5s ease;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-
-    .success {
-      color: var(--complete);
-      background: rgba(76, 175, 80, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      text-align: center;
-      border-left: 4px solid var(--complete);
-    }
-
-    .btn {
-      border-radius: 12px;
-      padding: 15px 25px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      border: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .btn:hover::before {
-      left: 100%;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-    }
-
-    .btn-warning {
-      background: linear-gradient(135deg, #ffc107, #fd7e14);
-      box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
-    }
-
-    .btn-info {
-      background: linear-gradient(135deg, #17a2b8, #6f42c1);
-      box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
-    }
-
-    .form-control {
-      border-radius: 12px;
-      padding: 15px 20px;
-      border: 2px solid #e9ecef;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
-      transform: translateY(-2px);
-    }
-
-    .input-group-text {
-      border-radius: 12px 0 0 12px;
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      color: white;
-      border: none;
-    }
-
-    .professor-response {
-      margin-top: 25px;
-      padding: 25px;
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-      border-radius: 16px;
-      border-left: 5px solid var(--primary);
-      animation: fadeIn 0.5s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .module-status {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-      padding: 10px;
-      border-radius: 10px;
-      background: rgba(248, 249, 250, 0.8);
-      transition: transform 0.2s ease;
-    }
-
-    .module-status:hover {
-      transform: translateX(5px);
-      background: rgba(67, 97, 238, 0.05);
-    }
-
-    .status-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      min-width: 90px;
-      text-align: center;
-    }
-
-    .status-assigned {
-      background-color: #fff3cd;
-      color: #856404;
-    }
-
-    .status-submitted {
-      background-color: #cce5ff;
-      color: #004085;
-    }
-
-    .status-completed {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .progress {
-      height: 28px;
-      border-radius: 14px;
-      background: rgba(67, 97, 238, 0.1);
-      overflow: hidden;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .progress-bar {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      transition: width 1s ease-in-out;
-    }
-
-    model-viewer {
-      border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-    }
-
-    model-viewer:hover {
-      transform: scale(1.02);
-    }
-
-    .speech-controls {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      align-items: center;
-      animation: slideIn 0.5s ease;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .speech-btn {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-
-    .speech-btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .speak-btn {
-      background: linear-gradient(135deg, var(--primary), #5a67d8);
-      color: white;
-      box-shadow: 0 4px 极狐12px rgba(67, 97, 238, 0.3);
-    }
-
-    .stop-btn {
-      background: linear-gradient(135deg, var(--error), #c53030);
-      color: white;
-      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
-    }
-
-    #result, #assessmentResult, #evaluationResult {
-      animation: fadeIn 0.7s ease;
-    }
-
-    h1, h2, h3, h4, h5 {
-      background: linear-gradient(135deg, var(--dark), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* Professor Animations */
-    @keyframes professorThink {
-      0% { transform: translateY(0) rotate(0deg); }
-      25% { transform: translateY(-5px) rotate(-2deg); }
-      50% { transform: translateY(0) rotate(0deg); }
-      75% { transform: translateY(-5px) rotate(2极狐deg); }
-      100% { transform: translateY(0) rotate(0deg); }
-    }
-
-    @keyframes professorExplain {
-      0% { transform: scale(1) translateX(0); }
-      25% { transform: scale(1.02) translateX(-5px); }
-      50% { transform: scale(1) translateX(0); }
-      75% { transform: scale(1.02) translateX(5px); }
-      100% { transform: scale极狐(1) translateX(0); }
-    }
-
-    @keyframes professorTalk {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-5px); }
-    }
-
-    :root {
-      --animation-name: professorTalk;
-    }
-
-    .professor-animation {
-      animation: var(--animation-name) 0.5s infinite alternate;
-    }
-
-    .video-container {
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 20px 0;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .video-player {
-      width: 100%;
-      height: 400px;
-      background: #000;
-    }
-
-    .video-controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      justify-content: center;
-    }
-
-    .video-control-btn {
-      padding: 8px 15px;
-      border-radius: 6px;
-      border: none;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .video-control-btn:hover {
-      background: var(--secondary);
-    }
-
-    .expression-btn.active {
-      background-color: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    .professor-container {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .professor-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 15px;
-      flex-wrap: wrap;
-    }
-
-    .professor-btn {
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: none;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .professor-btn:hover {
-      background: var(--secondary);
-      transform: translateY(-2px);
-    }
-
-    .expression-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .expression-btn {
-      padding: 8px 12px;
-      border-radius极狐: 6px;
-      border: 1px solid #ddd;
-      background: white;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .expression-btn:hover {
-      background: #f0f0f0;
-    }
-
-    @media (max-width: 768px) {
-      .custom-card {
-        padding: 25px;
-        margin-bottom: 20px;
-      }
-      
-      .btn {
-        padding: 12极狐px 20px;
-      }
-      
-      model-viewer {
-        width: 220px;
-        height: 220px;
-      }
-
-      .video-player {
-        height: 250px;
-      }
-
-      .professor-controls {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
-
-    @media (max-width: 576px) {
-      body {
-        padding: 15px;
-      }
-      
-      .custom-card {
-        padding: 20px;
-      }
-      
-      .header-icon {
-        font-size: 2rem;
-      }
-      
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      h2 {
-        font-size: 1.5rem;
-      }
-      
-      .video-player {
-        height: 200px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="custom-card">
-      <div class="text-center mb-4">
-        <div class="header-icon">
-          <i class="fas fa-graduation-cap"></i>
-        </div>
-        <h1 class="fw-bold">AI Course Generator</h1>
-        <p class="text-muted">Enter a topic to generate a custom course outline</p>
-      </div>
-
-      <div class="input-group mb-4">
-        <span class极狐="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="text" id="topic" class="form-control" placeholder="e.g. Machine Learning, Web Dev">
-      </div>
-      <div class="d-grid">
-        <button id="generateBtn" class="btn btn-primary">
-          <i class="fas fa-plus-circle"></极狐i> Generate Course
-        </button>
-      </div>
-
-      <div class="loading text-center mt-3" style="display:none;">
-        <div class="loading-spinner"></div>
-        <p class="text-muted mt-2">Generating your course...</p>
-      </div>
-
-      <div id="result" class="mt-4"></div>
-    </div>
-
-    <div class="custom-card">
-      <h2 class="text-center mb-3">🎓 AI Professor Assistant</h2>
-      
-      <div class="professor-container">
-        <div class="d-flex justify-content-center mb-4">
-          <model-viewer 
-            id="professor-model"
-            src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
-            alt="AI Professor Avatar"
-            auto-rotate 
-            camera-controls
-            camera-orbit="0deg 75deg 105%"
-            interaction-prompt="none"
-            shadow-intensity="1"
-            environment-image="neutral"
-            exposure="1.0"
-            style="width: 280px; height: 280px;"
-          >
-          </model-viewer>
-        </div>
-
-        <div class="professor-controls">
-          <button class="professor-btn" id="explainBtn">
-            <i class="fas fa-chalkboard-teacher"></i> Explain Concept
-          </button>
-          <button class="professor-btn" id="exampleBtn">
-            <i class="fas fa-lightbulb"></i> Give Example
-          </button>
-          <button class="professor-btn" id="summarizeBtn">
-            <i class="fas fa-file-alt"></i> Summarize
-          </button>
-          <button class="professor-btn" id="videoLessonBtn">
-            <i class="fas fa-video"></i> Video Lesson
-          </button>
-        </div>
-
-        <div class="expression-buttons">
-          <button class="expression-btn" data-expression="happy">😊 Happy</button>
-          <button class="expression-btn" data-expression="explaining">💡 Explaining</button>
-          <button class="expression-btn" data-expression="thinking">🤔 Thinking</button>
-        </div>
-      </div>
-
-      <div class="input-group mb-3">
-        <input type="text" id="question" class="form-control" placeholder="Ask me anything about your course...">
-        <button id="askBtn" class="btn btn-success">Ask Professor</button>
-      </div>
-      
-      <div id="professor-response" class="professor-response" style="display: none;"></div>
-      
-      <div class="speech-controls" id="speechControls极狐" style="display: none;">
-        <button class="speech-btn speak-btn" id="speakBtn">
-          <i class="fas fa-play"></i> Speak Answer
-        </button>
-        <button class="speech-btn stop-btn" id="stopBtn">
-          <i class="fas fa-stop"></i> Stop
-        </button>
-        <span class="speech-status" id="speechStatus"></span>
-      </div>
-    </div>
-
-    <div class="custom-card">
-      <h2 class="text-center mb-3">📝 Practical Assessments</h2>
-      
-      <div class="mb-3">
-        <label class="form-label">Select Module for Assessment:</label>
-        <input type="text" id="moduleName" class="form-control" placeholder="e.g., HTML Basics, CSS Styling">
-      </div>
-      
-      <极狐div class="d-grid gap-2">
-        <button id="generateAssessmentBtn" class="btn btn-warning">
-          <i class="fas fa-tasks"></i> Generate Assessment
-        </button>
-      </div>
-
-      <div id="assessmentResult" class="mt-3 p-3 bg-light rounded" style="display: none;"></div>
-
-      <div id="submissionArea" class="mt-3" style="display: none;">
-        <h5>Your Submission:</h5>
-        <textarea id="submissionText" class="form-control" rows="5" 
-                  placeholder="Paste your code, write your answer, or describe your project..."></textarea>
-        <div class="d-grid mt-2">
-          <button id="submitAssessmentBtn" class="btn btn-success">
-            <i class="fas fa-paper-plane"></i> Submit Assessment
-          </button>
-        </div>
-      </div>
-
-      <div id="evaluationResult" class="mt-3 p-3 bg-light rounded" style="display: none;"></div>
-    </div>
-
-    <div class="custom-card">
-      <h2 class="text-center mb-3">📊 Your Learning Progress</h2>
-      
-      <div class="d-grid mb-3">
-        <button id="checkProgressBtn" class="btn btn-info">
-          <i class="fas fa-chart-line"></i> Check Progress
-        </button>
-      </div>
-      
-      <div id="progressResult" class="mt-3">
-        <p class="text-center text-muted">Your progress will appear here after completing assessments</p>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.1/model-viewer.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    let currentSpeech = null;
-    let isSpeaking = false;
-    let currentTopic = "";
-    let currentModule = "";
-    let currentVideo = null;
-
-    function stopSpeech() {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        isSpeaking = false;
-        document.getElementById("speechStatus").textContent = "Stopped";
-        document.getElementById("professor-model").classList.remove("professor-animation");
-        setTimeout(() => {
-          document.getElementById("speechStatus").textContent = "";
-        }, 2000);
-      }
-    }
-
-    function speakText(text) {
-      stopSpeech();
-      const cleanText = text.replace(/[#*\[\]]/g, '');
-      currentSpeech = new SpeechSynthesisUtterance(cleanText);
-      currentSpeech.onstart = () => {
-        isSpeaking = true;
-        document.getElementById("speechStatus").textContent = "Speaking...";
-        document.getElementById("professor-model").classList.add("professor-animation");
-      };
-      currentSpeech.onend = () => {
-        isSpeaking = false;
-        document.getElementById("speechStatus").textContent = "Finished";
-        document.getElementById("professor-model").classList.remove("professor-animation");
-        setTimeout(() => {
-          document.getElementById("speechStatus").textContent = "";
-        }, 2000);
-      };
-      currentSpeech.onerror = () => {
-        isSpeaking = false;
-        document.getElementById("speechStatus").textContent = "Error";
-        document.getElementById("professor-model").classList.remove("professor-animation");
-      };
-      window.speech极狐Synthesis.speak(currentSpeech);
-    }
-
-    function animateProfessor(expression = "talking") {
-      const professor = document.getElementById("professor-model");
-      professor.classList.add("professor-animation");
-      
-      // Change animation based on expression
-      if (expression === "thinking") {
-        professor.style.setProperty('--animation-name', 'professorThink');
-      } else if (expression === "explaining") {
-        professor.style.setProperty('--animation-name', 'professorExplain');
-      } else {
-        professor.style.setProperty('--animation-name', 'professorTalk');
-      }
-      
-      setTimeout(() => {
-        professor.classList.remove("professor-animation");
-      }, 2000);
-    }
-
-    function createVideoPlayer(videoUrl, title, duration) {
-      return `
-        <div class="video-container">
-          <h4>🎥 ${title}</h4>
-          <p class="text-muted">Duration: ${duration}</p>
-          <video class="video-player" controls id="lesson-video">
-            <source src="${videoUrl}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <div class="video-controls">
-            <button class="video-control-btn" onclick="document.getElementById('lesson-video').play()">
-              <i class="fas fa-play"></i> Play
-            </button>
-            <button class="video-control-btn" onclick="document.getElementById('lesson-video').pause()">
-              <i class="fas fa-pause"></i> Pause
-            </button>
-            <button class="video-control-btn" onclick="document.getElementById('lesson-video').currentTime = 0">
-              <i class="fas fa-redo"></i> Restart
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    // Sample educational videos (free to use)
-    const educationalVideos = {
-      "html": {
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        title: "HTML Basics Tutorial",
-        duration: "10:15"
-      },
-      "css": {
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        title: "CSS Styling Guide",
-        duration: "12:30"
-      },
-      "javascript": {
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        title: "JavaScript Fundamentals",
-        duration: "15:45"
-      },
-      "python": {
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-        title: "Python Programming",
-        duration: "18:20"
-      }
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const generateBtn = document.getElementById("generateBtn");
-      const topicInput = document.getElementById("topic");
-      const resultDiv = document.getElementById("result");
-      const loadingDiv = document.querySelector('.loading');
-      const askBtn = document.getElementById("askBtn");
-      const questionInput = document.getElementById("question");
-      const professorResponse = document.getElementById("professor-response");
-      const speechControls = document.getElementById("speechControls");
-      const speakBtn = document.getElementById("speakBtn");
-      const stopBtn = document.getElementById("stopBtn");
-      const explainBtn = document.getElementById("explainBtn");
-      const exampleBtn = document.getElementById("exampleBtn");
-      const summarizeBtn = document.getElementById("summarizeBtn");
-      const videoLessonBtn = document.getElementById("videoLessonBtn");
-      const expressionBtns = document.querySelectorAll(".expression-btn");
-      const generateAssessmentBtn = document.getElementById("generateAssessmentBtn");
-      const submitAssessmentBtn = document.getElementById("submitAssessmentBtn");
-      const checkProgressBtn = document.getElementById("checkProgressBtn");
-      const assessmentResult = document.getElementById("assessmentResult");
-      const submissionArea = document.getElementById("submissionArea");
-      const evaluationResult = document.getElementById("evaluationResult");
-      const progressResult = document.getElementById("progressResult");
-
-      // Expression buttons
-      expressionBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-          // Remove active class from all buttons
-          expressionBtns.forEach(b => b.classList.remove("active"));
-          
-          // Add active class to clicked button
-          btn.classList.add("active");
-          
-          const expression = btn.getAttribute("data-expression");
-          animateProfessor(expression);
-          
-          // Change professor's pose based on expression
-          const professor = document.getElementById("professor-model");
-          switch(expression) {
-            case "happy":
-              professor.cameraOrbit = "0deg 75deg 105%";
-              break;
-            case "explaining":
-              professor.camera极狐Orbit = "45deg 75deg 105%";
-              break;
-            case "thinking":
-              professor.cameraOrbit = "-45deg 75deg 105%";
-              break;
-          }
-        });
-      });
-
-      // Professor interaction buttons
-      explainBtn.addEventListener("click", async () => {
-        if (!currentTopic) {
-          professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
-          professorResponse.style.display = 'block';
-          return;
-        }
-
-        professorResponse.style.display = 'block';
-        professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is preparing an explanation...</p>";
-        animateProfessor("explaining");
-
-        try {
-          const res = await fetch("/explain_concept", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ topic: currentTopic })
-          });
-
-          const data = await res.json();
-          if (data.explanation) {
-            professorResponse.innerHTML = `
-              <h4>📚 Explanation of ${currentTopic}</h4>
-              ${marked.parse(data.explanation)}
-            `;
-            speechControls.style.display = 'flex';
-            speakText(data.explanation);
-          } else {
-            professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
-          }
-        } catch (err) {
-          professorResponse.innerHTML = `<div class="error">Failed to get explanation. Please make sure the backend is running.</div>`;
-        }
-      });
-
-      exampleBtn.addEventListener("click", async () => {
-        if (!currentTopic) {
-          professorResponse.innerHTML = `<极狐div class="error">Please generate a course first</div>`;
-          professorResponse.style.display = 'block';
-          return;
-        }
-
-        professorResponse.style.display = 'block';
-        professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is preparing an example...</p>";
-        animateProfessor("explaining");
-
-        try {
-          const res = await fetch("/give_example", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ topic: currentTopic })
-          });
-
-          const data = await res.json();
-          if (data.example) {
-            professorResponse.innerHTML = `
-              <h4>💡 Practical Example</h4>
-              ${marked.parse(data.example)}
-            `;
-            speechControls.style.display = 'flex';
-            speakText(data.example);
-          } else {
-            professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
-          }
-        } catch (err) {
-          professorResponse.innerHTML = `<div class="error">Failed to get example. Please make sure the backend is running.</div>`;
-        }
-      });
-
-      summarizeBtn.addEventListener("click", async () => {
-        if (!currentTopic) {
-          professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
-          professorResponse.style.display = 'block';
-          return;
-        }
-
-        professorResponse.style.display = 'block';
-        professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is preparing a summary...</p>";
-        animateProfessor("thinking");
-
-        try {
-          const res = await fetch("/summarize_topic", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ topic: currentTopic })
-          });
-
-          const data = await res.json();
-          if (data.summary极狐) {
-            professorResponse.innerHTML = `
-              <h4极狐>📝 Summary of ${currentTopic}</h4>
-              ${marked.parse(data.summary)}
-            `;
-            speechControls.style.display = 'flex';
-            speakText(data.summary);
-          } else {
-            professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
-          }
-        } catch (err) {
-          professorResponse.innerHTML = `<div class="error">Failed to get summary. Please make sure the backend is running.</div>`;
-        }
-      });
-
-      videoLessonBtn.addEventListener("click", async () => {
-        if (!currentTopic) {
-          professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
-          professorResponse.style.display = 'block';
-          return;
-        }
-
-        const moduleName = prompt("Which module would you like a video lesson for?");
-        if (!moduleName) return;
-
-        professorResponse.style.display = 'block';
-        professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Loading video lesson...</p>";
-        animateProfessor("explaining");
-
-        try {
-          const res = await fetch("/get_video_lesson", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              topic: currentTopic,
-              module: moduleName 
-            })
-          });
-
-          const data = await res.json();
-          
-          // Check if we have a predefined video for this module
-          const moduleKey = moduleName.toLowerCase();
-          let videoHtml = '';
-          
-          if (educationalVideos[moduleKey]) {
-            const video = educationalVideos[moduleKey];
-            videoHtml = createVideoPlayer(video.url, video.title, video.duration);
-          } else {
-            // Fallback to placeholder if no specific video found
-            videoHtml = `
-              <div class="video-container">
-                <div class="bg-dark text-white p-5 rounded text-center">
-                  <i class="fas fa-video fa-3x mb-3"></i>
-                  <p>Video Lesson: ${moduleName}</p>
-                  <p class="text-muted">Duration: ${data.duration || '10-15 minutes'}</p>
-                  <small>Sample educational video</small>
-                </div>
-              </div>
-            `;
-          }
-
-          if (data.lesson_script) {
-            professorResponse.innerHTML = `
-              <h4>🎥 ${data.title || `Video Lesson: ${moduleName}`}</h4>
-              ${videoHtml}
-              <h5 class="mt-4">Lesson Content:</h5>
-              ${marked.parse(data.lesson_script)}
-            `;
-          } else {
-            professorResponse.innerHTML = `
-              <h4>🎥 Video Lesson: ${moduleName}</h4>
-              ${videoHtml}
-              <div class="error mt-3">Detailed lesson content not available</div>
-            `;
-          }
-        } catch (err) {
-          // Fallback to using our predefined videos if API fails
-          const moduleKey = moduleName.toLowerCase();
-          let videoHtml = '';
-          
-          if (educationalVideos[moduleKey]) {
-            const video = educationalVideos[moduleKey];
-            videoHtml = createVideoPlayer(video.url, video.title, video.duration);
-          } else {
-            // Use a default video if module not found
-            const defaultVideo = educationalVideos["html"];
-            videoHtml = createVideoPlayer(defaultVideo.url, `Introduction to ${moduleName}`, "12:00");
-          }
-          
-          professorResponse.innerHTML = `
-            <h4>🎥 Video Lesson: ${moduleName}</h4>
-            ${videoHtml}
-            <h5 class="mt-4">Lesson Overview:</h5>
-            <p>This video provides a comprehensive overview of ${moduleName} as part of your ${currentTopic} course. 
-            Watch the video to learn key concepts and practical applications.</p>
-            <div class="alert alert-info mt-3">
-              <i class="fas fa-info-circle"></i> This is a sample educational video. In a full implementation, 
-              you would have AI-generated video content specific to your course.
-            </div>
-          `;
-        }
-      });
-
-      speakBtn.addEventListener("click", () => {
-        const responseText = professorResponse.textContent;
-        if (responseText && responseText !== "Thinking..." && !responseText.includes("Error")) {
-          speakText(responseText);
-        }
-      });
-
-      stopBtn.addEventListener("click", stopSpeech);
-
-      generateBtn.addEventListener("click", async () => {
-        const topic = topicInput.value.trim();
-        if (!topic) {
-          resultDiv.innerHTML = `<div class="error">⚠️ Please enter a topic</div>`;
-          return;
-        }
-
-        currentTopic = topic;
-        generateBtn.disabled = true;
-        loadingDiv.style.display = 'block';
-        resultDiv.style.display = 'none';
-
-        try {
-          const res = await fetch("/generate_course", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ topic })
-          });
-
-          const data = await res.json();
-          if (data.course) {
-            resultDiv.innerHTML = `<h3 class="text-primary">Your ${topic} Course</h3>${marked.parse(data.course)}`;
-          } else {
-            resultDiv.innerHTML = `<div class="error">${data.error}</div>`;
-          }
-        } catch (err) {
-          resultDiv.innerHTML = `<div class="error">Failed to connect to backend.</div>`;
-        } finally {
-          loadingDiv.style.display = 'none';
-          resultDiv.style.display = 'block';
-          generateBtn.disabled = false;
-        }
-      });
-
-      topicInput.addEventListener("keypress", e => {
-        if (e.key === "Enter") generateBtn.click();
-      });
-
-      askBtn.addEventListener("click", async () => {
-        const question = questionInput.value.trim();
-        if (!question) return;
-
-        professorResponse.style.display = 'block';
-        professorResponse.innerHTML = "<div class='loading-spinner'></div><极狐p class='text-center'>Professor is thinking...</p>";
-        speechControls.style.display = 'none';
-        animateProfessor("thinking");
-
-        try {
-          const res = await fetch("/ask_professor", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question })
-          });
-
-          const data = await res.json();
-          if (data.answer) {
-            professorResponse.innerHTML = marked.parse(data.answer);
-            speechControls.style.display = 'flex';
-          } else {
-            professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
-          }
-        } catch (err) {
-          professorResponse.innerHTML = `<div class="error">Failed to get professor's response.</div>`;
-        }
-      });
-
-      questionInput.addEventListener("keypress", e => {
-        if (e.key === "Enter") askBtn.click();
-      });
-
-      generateAssessmentBtn.addEventListener("click", async () => {
-        currentModule = document.getElementById("moduleName").value.trim();
-        const topic = document.getElementById("topic").value.trim();
-        
-        if (!currentModule || !topic) {
-          assessmentResult.innerHTML = `<div class="error">Please enter both topic and module name</div>`;
-          assessmentResult.style.display = 'block';
-          return;
-        }
-
-        generateAssessmentBtn.disabled = true;
-        assessmentResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Generating assessment...</p>";
-        assessmentResult.style.display = 'block';
-
-        try {
-          const res = await fetch("/generate_assessment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              topic: topic, 
-              module: currentModule,
-              student_id: "student_001"
-            })
-          });
-
-          const data = await res.json();
-          if (data.assessment) {
-            assessmentResult.innerHTML = `
-              <h4>${currentModule} Assessment</h4>
-              ${marked.parse(data.assessment)}
-            `;
-            submissionArea.style.display = 'block';
-          } else {
-            assessmentResult.innerHTML = `<div class="error">${data.error}</div>`;
-          }
-        } catch (err) {
-          assessmentResult.innerHTML = `<div class="error">Failed to generate assessment</div>`;
-        } finally {
-          generateAssessmentBtn.disabled = false;
-        }
-      });
-
-      submitAssessmentBtn.addEventListener("click", async () => {
-        const submission = document.getElementById("submissionText").value.trim();
-        
-        if (!submission) {
-          alert("Please provide your submission first");
-          return;
-        }
-
-        submitAssessmentBtn.disabled = true;
-        evaluationResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Submitting...</p>";
-        evaluationResult.style.display = 'block';
-
-        try {
-          const submitRes = await fetch("/submit_assessment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              module: currentModule,
-              submission: submission,
-              student_id: "student_001"
-            })
-          });
-
-          const submitData = await submitRes.json();
-          
-          if (submitData.status === "submitted") {
-            const evalRes = await fetch("/evaluate_assessment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                module: currentModule,
-                student_id: "student_001"
-              })
-            });
-
-            const evalData = await evalRes.json();
-            if (evalData.feedback) {
-              evaluationResult.innerHTML = `
-                <h4>Professor's Feedback</h4>
-                ${marked.parse(evalData.feedback)}
-                <div class="mt-3 success">
-                  <i class="fas fa-check-circle"></i> Module marked as completed!
-                </div>
-              `;
-            }
-          }
-        } catch (err) {
-          evaluationResult.innerHTML = `<div class="error">Submission failed</div>`;
-        } finally {
-          submitAssessmentBtn.disabled = false;
-        }
-      });
-
-      checkProgressBtn.addEventListener("click", async () => {
-        checkProgressBtn.disabled = true;
-        progressResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Loading progress...</p>";
-
-        try {
-          const res = await fetch("/get_progress", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: "student_001" })
-          });
-
-          const data = await res.json();
-          if (data.progress) {
-            const completed = data.progress.completed || [];
-            const total = Object.keys(data.assessments || {}).length;
-            
-            let modulesHtml = '';
-            if (data.assessments) {
-              for (const [moduleName, assessment] of Object.entries(data.assessments)) {
-                const status = assessment.status || 'assigned';
-                modulesHtml += `
-                  <div class="module-status">
-                    <span class="status-badge status-${status}">${status}</span>
-                    <span>${moduleName}</span>
-                  </div>
-                `;
-              }
-            }
-            
-            progressResult.innerHTML = `
-              <h5>Overall Progress</h5>
-              <div class="progress mb-3" style="height: 25px;">
-                <极狐div class="progress-bar" role="progressbar" 
-                     style="width: ${total > 0 ? (completed.length / total * 100) : 0}%">
-                  ${completed.length}/${total} completed
-                </div>
-              </div>
-              
-              <h5>Module Status</h5>
-              ${modulesHtml || '<p>No assessments yet</p>'}
-              
-              <h5 class="mt-3">Completed Modules:</h5>
-              <ul>
-                ${completed.map(module => `<li>${module}</li>`).join('') || '<li>None yet</li>'}
-              </ul>
-            `;
-          }
-        } catch (err) {
-          progressResult.innerHTML = `<div class="error">Failed to load progress</div>`;
-        } finally {
-          checkProgressBtn.disabled = false;
-        }
-      });
-    });
-
-    window.addEventListener('beforeunload', () => {
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && isSpeaking) {
-        e.preventDefault();
-        stopSpeech();
-      }
-    });
-  </script>
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1844,6 +622,13 @@
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.0.1/model-viewer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+
+
+
+
+
+
+<!-- 
   <script>
     let currentSpeech = null;
     let isSpeaking = false;
@@ -2124,7 +909,7 @@
         animateProfessor("explaining");
 
         try {
-          const res = await fetch("/get_video_lesson", {
+          const res = await fetch("/get_video_lectures", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
@@ -2135,39 +920,47 @@
 
           const data = await res.json();
           
-          // Check if we have a predefined video for this module
-          const moduleKey = moduleName.toLowerCase();
-          let videoHtml = '';
-          
-          if (educationalVideos[moduleKey]) {
-            const video = educationalVideos[moduleKey];
-            videoHtml = createVideoPlayer(video.url, video.title, video.duration);
-          } else {
-            // Fallback to placeholder if no specific video found
-            videoHtml = `
-              <div class="video-container">
-                <div class="bg-dark text-white p-5 rounded text-center">
-                  <i class="fas fa-video fa-3x mb-3"></i>
-                  <p>Video Lesson: ${moduleName}</p>
-                  <p class="text-muted">Duration: ${data.duration || '10-15 minutes'}</p>
-                  <small>Sample educational video</small>
+          if (data.videos && data.videos.length > 0) {
+            let videosHtml = '<h4>🎥 Recommended Video Lectures</h4>';
+            data.videos.forEach((video, index) => {
+              videosHtml += `
+                <div class="video-container mb-3">
+                  <h5>${index + 1}. ${video.title}</h5>
+                  <p class="text-muted">Channel: ${video.channel}</p>
+                  <iframe 
+                    width="100%" 
+                    height="315" 
+                    src="${video.embed_url}" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                  </iframe>
+                  <p class="mt-2">${video.description.substring(0, 150)}...</p>
                 </div>
-              </div>
-            `;
-          }
-
-          if (data.lesson_script) {
-            professorResponse.innerHTML = `
-              <h4>🎥 ${data.title || `Video Lesson: ${moduleName}`}</h4>
-              ${videoHtml}
-              <h5 class="mt-4">Lesson Content:</h5>
-              ${marked.parse(data.lesson_script)}
-            `;
+              `;
+            });
+            
+            professorResponse.innerHTML = videosHtml;
           } else {
+            // Fallback to predefined videos
+            const moduleKey = moduleName.toLowerCase();
+            let videoHtml = '';
+            
+            if (educationalVideos[moduleKey]) {
+              const video = educationalVideos[moduleKey];
+              videoHtml = createVideoPlayer(video.url, video.title, video.duration);
+            } else {
+              // Use a default video if module not found
+              const defaultVideo = educationalVideos["html"];
+              videoHtml = createVideoPlayer(defaultVideo.url, `Introduction to ${moduleName}`, "12:00");
+            }
+            
             professorResponse.innerHTML = `
               <h4>🎥 Video Lesson: ${moduleName}</h4>
               ${videoHtml}
-              <div class="error mt-3">Detailed lesson content not available</div>
+              <h5 class="mt-4">Lesson Overview:</h5>
+              <p>This video provides a comprehensive overview of ${moduleName} as part of your ${currentTopic} course. 
+              Watch the video to learn key concepts and practical applications.</p>
             `;
           }
         } catch (err) {
@@ -2190,16 +983,12 @@
             <h5 class="mt-4">Lesson Overview:</h5>
             <p>This video provides a comprehensive overview of ${moduleName} as part of your ${currentTopic} course. 
             Watch the video to learn key concepts and practical applications.</p>
-            <div class="alert alert-info mt-3">
-              <i class="fas fa-info-circle"></i> This is a sample educational video. In a full implementation, 
-              you would have AI-generated video content specific to your course.
-            </div>
           `;
         }
       });
 
       speakBtn.addEventListener("click", () => {
-        const responseText = professorResponse.textContent;
+        const responseText = professorResponse.innerText || professorResponse.textContent;
         if (responseText && responseText !== "Thinking..." && !responseText.includes("Error")) {
           speakText(responseText);
         }
@@ -2233,7 +1022,7 @@
             resultDiv.innerHTML = `<div class="error">${data.error}</div>`;
           }
         } catch (err) {
-          resultDiv.innerHTML = `<div class="error">Failed to connect to backend.</div>`;
+          resultDiv.innerHTML = `<div class="error">Failed to connect to backend. Please make sure the Flask server is running.</div>`;
         } finally {
           loadingDiv.style.display = 'none';
           resultDiv.style.display = 'block';
@@ -2269,7 +1058,7 @@
             professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
           }
         } catch (err) {
-          professorResponse.innerHTML = `<div class="error">Failed to get professor's response.</div>`;
+          professorResponse.innerHTML = `<div class="error">Failed to get professor's response. Please check if the backend is running.</div>`;
         }
       });
 
@@ -2313,7 +1102,7 @@
             assessmentResult.innerHTML = `<div class="error">${data.error}</div>`;
           }
         } catch (err) {
-          assessmentResult.innerHTML = `<div class="error">Failed to generate assessment</div>`;
+          assessmentResult.innerHTML = `<div class="error">Failed to generate assessment. Please check backend connection.</div>`;
         } finally {
           generateAssessmentBtn.disabled = false;
         }
@@ -2328,10 +1117,11 @@
         }
 
         submitAssessmentBtn.disabled = true;
-        evaluationResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Submitting...</p>";
+        evaluationResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Submitting and evaluating...</p>";
         evaluationResult.style.display = 'block';
 
         try {
+          // First submit the assessment
           const submitRes = await fetch("/submit_assessment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -2345,6 +1135,7 @@
           const submitData = await submitRes.json();
           
           if (submitData.status === "submitted") {
+            // Then evaluate it
             const evalRes = await fetch("/evaluate_assessment", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -2357,16 +1148,20 @@
             const evalData = await evalRes.json();
             if (evalData.feedback) {
               evaluationResult.innerHTML = `
-                <h4>Professor's Feedback</h4>
+                <h4>🎯 Professor's Feedback</h4>
                 ${marked.parse(evalData.feedback)}
                 <div class="mt-3 success">
-                  <i class="fas fa-check-circle"></i> Module marked as completed!
+                  <i class="fas fa-check-circle"></i> Module "${currentModule}" marked as completed!
                 </div>
               `;
+            } else {
+              evaluationResult.innerHTML = `<div class="error">Evaluation failed: ${evalData.error}</div>`;
             }
+          } else {
+            evaluationResult.innerHTML = `<div class="error">Submission failed: ${submitData.error}</div>`;
           }
         } catch (err) {
-          evaluationResult.innerHTML = `<div class="error">Submission failed</div>`;
+          evaluationResult.innerHTML = `<div class="error">Submission failed. Please check backend connection.</div>`;
         } finally {
           submitAssessmentBtn.disabled = false;
         }
@@ -2387,14 +1182,16 @@
           if (data.progress) {
             const completed = data.progress.completed || [];
             const total = Object.keys(data.assessments || {}).length;
+            const assessments = data.assessments || {};
             
             let modulesHtml = '';
-            if (data.assessments) {
-              for (const [moduleName, assessment] of Object.entries(data.assessments)) {
+            if (Object.keys(assessments).length > 0) {
+              for (const [moduleName, assessment] of Object.entries(assessments)) {
                 const status = assessment.status || 'assigned';
+                const statusClass = `status-${status}`;
                 modulesHtml += `
                   <div class="module-status">
-                    <span class="status-badge status-${status}">${status}</span>
+                    <span class="status-badge ${statusClass}">${status}</span>
                     <span>${moduleName}</span>
                   </div>
                 `;
@@ -2402,25 +1199,27 @@
             }
             
             progressResult.innerHTML = `
-              <h5>Overall Progress</h5>
+              <h5>📈 Overall Progress</h5>
               <div class="progress mb-3" style="height: 25px;">
                 <div class="progress-bar" role="progressbar" 
                      style="width: ${total > 0 ? (completed.length / total * 100) : 0}%">
-                  ${completed.length}/${total} completed
+                  ${completed.length}/${total} completed (${total > 0 ? Math.round(completed.length / total * 100) : 0}%)
                 </div>
               </div>
               
-              <h5>Module Status</h5>
-              ${modulesHtml || '<p>No assessments yet</p>'}
+              <h5>📋 Module Status</h5>
+              ${modulesHtml || '<p class="text-muted">No assessments generated yet</p>'}
               
-              <h5 class="mt-3">Completed Modules:</h5>
-              <ul>
-                ${completed.map(module => `<li>${module}</li>`).join('') || '<li>None yet</li>'}
+              <h5 class="mt-3">✅ Completed Modules:</h5>
+              <ul class="list-group">
+                ${completed.length > 0 ? completed.map(module => `<li class="list-group-item">${module}</li>`).join('') : '<li class="list-group-item text-muted">None yet - complete assessments to see progress here!</li>'}
               </ul>
             `;
+          } else {
+            progressResult.innerHTML = `<div class="error">No progress data found</div>`;
           }
         } catch (err) {
-          progressResult.innerHTML = `<div class="error">Failed to load progress</div>`;
+          progressResult.innerHTML = `<div class="error">Failed to load progress. Please check backend connection.</div>`;
         } finally {
           checkProgressBtn.disabled = false;
         }
@@ -2438,7 +1237,894 @@
         e.preventDefault();
         stopSpeech();
       }
+    }); 
+  </script> -->
+
+  <script>let currentSpeech = null;
+    let isSpeaking = false;
+    let currentTopic = "";
+    let currentModule = "";
+    let currentVideo = null;
+    
+    function stopSpeech() {
+        if (isSpeaking) {
+            window.speechSynthesis.cancel();
+            isSpeaking = false;
+            document.getElementById("speechStatus").textContent = "Stopped";
+            document.getElementById("professor-model").classList.remove("professor-animation");
+            setTimeout(() => {
+                document.getElementById("speechStatus").textContent = "";
+            }, 2000);
+        }
+    }
+    
+    function speakText(text) {
+        stopSpeech();
+        const cleanText = text.replace(/[#*\[\]]/g, '');
+        currentSpeech = new SpeechSynthesisUtterance(cleanText);
+        currentSpeech.onstart = () => {
+            isSpeaking = true;
+            document.getElementById("speechStatus").textContent = "Speaking...";
+            document.getElementById("professor-model").classList.add("professor-animation");
+        };
+        currentSpeech.onend = () => {
+            isSpeaking = false;
+            document.getElementById("speechStatus").textContent = "Finished";
+            document.getElementById("professor-model").classList.remove("professor-animation");
+            setTimeout(() => {
+                document.getElementById("speechStatus").textContent = "";
+            }, 2000);
+        };
+        currentSpeech.onerror = () => {
+            isSpeaking = false;
+            document.getElementById("speechStatus").textContent = "Error";
+            document.getElementById("professor-model").classList.remove("professor-animation");
+        };
+        window.speechSynthesis.speak(currentSpeech);
+    }
+    
+    function animateProfessor(expression = "talking") {
+        const professor = document.getElementById("professor-model");
+        professor.classList.add("professor-animation");
+        
+        // Change animation based on expression
+        if (expression === "thinking") {
+            professor.style.setProperty('--animation-name', 'professorThink');
+        } else if (expression === "explaining") {
+            professor.style.setProperty('--animation-name', 'professorExplain');
+        } else {
+            professor.style.setProperty('--animation-name', 'professorTalk');
+        }
+        
+        setTimeout(() => {
+            professor.classList.remove("professor-animation");
+        }, 2000);
+    }
+    
+    function createVideoPlayer(videoUrl, title, duration) {
+        return `
+            <div class="video-container">
+                <h4>🎥 ${title}</h4>
+                <p class="text-muted">Duration: ${duration}</p>
+                <video class="video-player" controls id="lesson-video">
+                    <source src="${videoUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-controls">
+                    <button class="video-control-btn" onclick="document.getElementById('lesson-video').play()">
+                        <i class="fas fa-play"></i> Play
+                    </button>
+                    <button class="video-control-btn" onclick="document.getElementById('lesson-video').pause()">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="video-control-btn" onclick="document.getElementById('lesson-video').currentTime = 0">
+                        <i class="fas fa-redo"></i> Restart
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function getFallbackVideos(topic, module) {
+        const videoDatabase = {
+            "web development": {
+                "html": [
+                    {
+                        title: "HTML Full Course for Beginners",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/kUMe1FH4CHE",
+                        description: "Complete HTML tutorial for beginners covering all essential concepts",
+                        url: "https://www.youtube.com/watch?v=kUMe1FH4CHE"
+                    },
+                    {
+                        title: "HTML Crash Course for Absolute Beginners",
+                        channel: "Traversy Media",
+                        embed_url: "https://www.youtube.com/embed/UB1O30fR-EE",
+                        description: "Quick HTML crash course for absolute beginners",
+                        url: "https://www.youtube.com/watch?v=UB1O30fR-EE"
+                    }
+                ],
+                "css": [
+                    {
+                        title: "CSS Tutorial for Beginners",
+                        channel: "Programming with Mosh",
+                        embed_url: "https://www.youtube.com/embed/1PnVor36_40",
+                        description: "Learn CSS fundamentals and modern styling techniques",
+                        url: "https://www.youtube.com/watch?v=1PnVor36_40"
+                    },
+                    {
+                        title: "CSS Full Course for Beginners",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/1Rs2ND1ryYc",
+                        description: "Complete CSS tutorial with modern techniques",
+                        url: "https://www.youtube.com/watch?v=1Rs2ND1ryYc"
+                    }
+                ],
+                "javascript": [
+                    {
+                        title: "JavaScript Programming Full Course",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/jS4aFq5-91M",
+                        description: "Complete JavaScript tutorial from basics to advanced concepts",
+                        url: "https://www.youtube.com/watch?v=jS4aFq5-91M"
+                    },
+                    {
+                        title: "JavaScript Tutorial for Beginners",
+                        channel: "Programming with Mosh",
+                        embed_url: "https://www.youtube.com/embed/W6NZfCO5SIk",
+                        description: "JavaScript fundamentals for complete beginners",
+                        url: "https://www.youtube.com/watch?v=W6NZfCO5SIk"
+                    }
+                ],
+                "react": [
+                    {
+                        title: "React JS Full Course for Beginners",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/bMknfKXIFA8",
+                        description: "Complete React.js tutorial with modern hooks",
+                        url: "https://www.youtube.com/watch?v=bMknfKXIFA8"
+                    }
+                ],
+                "node.js": [
+                    {
+                        title: "Node.js Full Course for Beginners",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/Oe421EPjeBE",
+                        description: "Complete Node.js backend development course",
+                        url: "https://www.youtube.com/watch?v=Oe421EPjeBE"
+                    }
+                ]
+            },
+            "machine learning": {
+                "python": [
+                    {
+                        title: "Machine Learning with Python",
+                        channel: "Sentdex",
+                        embed_url: "https://www.youtube.com/embed/OGxgnH8y2NM",
+                        description: "Python machine learning tutorial series",
+                        url: "https://www.youtube.com/watch?v=OGxgnH8y2NM"
+                    }
+                ],
+                "neural networks": [
+                    {
+                        title: "Neural Networks Explained",
+                        channel: "3Blue1Brown",
+                        embed_url: "https://www.youtube.com/embed/aircAruvnKk",
+                        description: "Visual introduction to neural networks",
+                        url: "https://www.youtube.com/watch?v=aircAruvnKk"
+                    }
+                ],
+                "tensorflow": [
+                    {
+                        title: "TensorFlow 2.0 Complete Course",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/tPYj3fFJGjk",
+                        description: "Complete TensorFlow tutorial for deep learning",
+                        url: "https://www.youtube.com/watch?v=tPYj3fFJGjk"
+                    }
+                ]
+            },
+            "python": {
+                "basics": [
+                    {
+                        title: "Python for Beginners",
+                        channel: "Programming with Mosh",
+                        embed_url: "https://www.youtube.com/embed/kqtD5dpn9C8",
+                        description: "Complete Python tutorial for absolute beginners",
+                        url: "https://www.youtube.com/watch?v=kqtD5dpn9C8"
+                    }
+                ],
+                "data science": [
+                    {
+                        title: "Python for Data Science",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/LHBE6Q9XlzI",
+                        description: "Python data science and analysis tutorial",
+                        url: "https://www.youtube.com/watch?v=LHBE6Q9XlzI"
+                    }
+                ]
+            },
+            "data structures": {
+                "algorithms": [
+                    {
+                        title: "Data Structures and Algorithms",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/8hly31xKli0",
+                        description: "Complete data structures and algorithms course",
+                        url: "https://www.youtube.com/watch?v=8hly31xKli0"
+                    }
+                ]
+            },
+            "java": {
+                "programming": [
+                    {
+                        title: "Java Programming for Beginners",
+                        channel: "FreeCodeCamp",
+                        embed_url: "https://www.youtube.com/embed/eIrMbAQSU34",
+                        description: "Complete Java programming tutorial",
+                        url: "https://www.youtube.com/watch?v=eIrMbAQSU34"
+                    }
+                ]
+            }
+        };
+    
+        const topicKey = topic.toLowerCase();
+        const moduleKey = module.toLowerCase();
+        
+        // Try exact match first
+        if (videoDatabase[topicKey] && videoDatabase[topicKey][moduleKey]) {
+            return videoDatabase[topicKey][moduleKey];
+        }
+        
+        // Try partial matches
+        for (const [dbTopic, modules] of Object.entries(videoDatabase)) {
+            if (topicKey.includes(dbTopic) || dbTopic.includes(topicKey)) {
+                for (const [dbModule, videos] of Object.entries(modules)) {
+                    if (moduleKey.includes(dbModule) || dbModule.includes(moduleKey)) {
+                        return videos;
+                    }
+                }
+            }
+        }
+        
+        // Return general programming videos if specific not found
+        return [
+            {
+                title: `Learn ${topic} - ${module}`,
+                channel: "FreeCodeCamp",
+                embed_url: "https://www.youtube.com/embed/8mAITcNt710",
+                description: `Comprehensive tutorial on ${module} in ${topic}`,
+                url: "https://www.youtube.com/watch?v=8mAITcNt710"
+            },
+            {
+                title: `${module} Tutorial for Beginners`,
+                channel: "Programming with Mosh",
+                embed_url: "https://www.youtube.com/embed/ZxKM3DCV2kE",
+                description: `Learn ${module} step by step with practical examples`,
+                url: "https://www.youtube.com/watch?v=ZxKM3DCV2kE"
+            }
+        ];
+    }
+    
+    function getEducationalContentFallback(topic, module) {
+        const searchQuery = encodeURIComponent(`${topic} ${module} tutorial`);
+        return `
+            <div class="alert alert-info">
+                <h4>🎓 Learning Resources for ${topic} - ${module}</h4>
+                <p>Here are excellent educational resources to help you learn:</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5>🎯 Recommended Video Platforms</h5>
+                            <ul class="list-unstyled">
+                                <li><a href="https://www.youtube.com/results?search_query=${searchQuery}" target="_blank" class="btn btn-outline-primary btn-sm mb-2">📹 YouTube Tutorials</a></li>
+                                <li><a href="https://www.freecodecamp.org/learn" target="_blank" class="btn btn-outline-success btn-sm mb-2">💻 FreeCodeCamp</a></li>
+                                <li><a href="https://www.coursera.org/search?query=${encodeURIComponent(topic)}" target="_blank" class="btn btn-outline-warning btn-sm mb-2">🎓 Coursera</a></li>
+                                <li><a href="https://www.udemy.com/courses/search/?q=${encodeURIComponent(topic)}" target="_blank" class="btn btn-outline-danger btn-sm mb-2">📚 Udemy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5>💡 Effective Learning Strategies</h5>
+                            <ul>
+                                <li>Watch videos at 1.25x speed for better focus</li>
+                                <li>Practice along with the tutorials</li>
+                                <li>Take detailed notes and build projects</li>
+                                <li>Join online communities for support</li>
+                                <li>Review and practice regularly</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <h5>🔍 Smart Search Suggestions:</h5>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge bg-primary">"${topic} ${module} tutorial"</span>
+                    <span class="badge bg-primary">"learn ${module} step by step"</span>
+                    <span class="badge bg-primary">"${topic} course for beginners"</span>
+                    <span class="badge bg-primary">"${module} hands-on project"</span>
+                </div>
+            </div>
+            
+            <div class="mt-3 p-3 bg-light rounded">
+                <h6>🤖 AI Study Guide:</h6>
+                <p>For <strong>${module}</strong> in <strong>${topic}</strong>, focus on understanding the core concepts first. 
+                Start with basic examples, then gradually move to more complex projects. Practice regularly 
+                and use the AI professor feature to clarify any doubts!</p>
+                
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('askBtn').click()">
+                        <i class="fas fa-question-circle"></i> Ask AI Professor about ${module}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const generateBtn = document.getElementById("generateBtn");
+        const topicInput = document.getElementById("topic");
+        const resultDiv = document.getElementById("result");
+        const loadingDiv = document.querySelector('.loading');
+        const askBtn = document.getElementById("askBtn");
+        const questionInput = document.getElementById("question");
+        const professorResponse = document.getElementById("professor-response");
+        const speechControls = document.getElementById("speechControls");
+        const speakBtn = document.getElementById("speakBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const explainBtn = document.getElementById("explainBtn");
+        const exampleBtn = document.getElementById("exampleBtn");
+        const summarizeBtn = document.getElementById("summarizeBtn");
+        const videoLessonBtn = document.getElementById("videoLessonBtn");
+        const expressionBtns = document.querySelectorAll(".expression-btn");
+        const generateAssessmentBtn = document.getElementById("generateAssessmentBtn");
+        const submitAssessmentBtn = document.getElementById("submitAssessmentBtn");
+        const checkProgressBtn = document.getElementById("checkProgressBtn");
+        const assessmentResult = document.getElementById("assessmentResult");
+        const submissionArea = document.getElementById("submissionArea");
+        const evaluationResult = document.getElementById("evaluationResult");
+        const progressResult = document.getElementById("progressResult");
+    
+        // Expression buttons
+        expressionBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                // Remove active class from all buttons
+                expressionBtns.forEach(b => b.classList.remove("active"));
+                
+                // Add active class to clicked button
+                btn.classList.add("active");
+                
+                const expression = btn.getAttribute("data-expression");
+                animateProfessor(expression);
+                
+                // Change professor's pose based on expression
+                const professor = document.getElementById("professor-model");
+                switch(expression) {
+                    case "happy":
+                        professor.cameraOrbit = "0deg 75deg 105%";
+                        break;
+                    case "explaining":
+                        professor.cameraOrbit = "45deg 75deg 105%";
+                        break;
+                    case "thinking":
+                        professor.cameraOrbit = "-45deg 75deg 105%";
+                        break;
+                }
+            });
+        });
+    
+        // Professor interaction buttons
+        explainBtn.addEventListener("click", async () => {
+            if (!currentTopic) {
+                professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
+                professorResponse.style.display = 'block';
+                return;
+            }
+    
+            professorResponse.style.display = 'block';
+            professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is preparing an explanation...</p>";
+            animateProfessor("explaining");
+    
+            try {
+                const res = await fetch("/explain_concept", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic: currentTopic })
+                });
+    
+                const data = await res.json();
+                if (data.explanation) {
+                    professorResponse.innerHTML = `
+                        <h4>📚 Explanation of ${currentTopic}</h4>
+                        ${marked.parse(data.explanation)}
+                    `;
+                    speechControls.style.display = 'flex';
+                    speakText(data.explanation);
+                } else {
+                    professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (err) {
+                professorResponse.innerHTML = `<div class="error">Failed to get explanation. Please make sure the backend is running.</div>`;
+            }
+        });
+    
+        exampleBtn.addEventListener("click", async () => {
+            if (!currentTopic) {
+                professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
+                professorResponse.style.display = 'block';
+                return;
+            }
+    
+            professorResponse.style.display = 'block';
+            professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is preparing an example...</p>";
+            animateProfessor("explaining");
+    
+            try {
+                const res = await fetch("/give_example", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic: currentTopic })
+                });
+    
+                const data = await res.json();
+                if (data.example) {
+                    professorResponse.innerHTML = `
+                        <h4>💡 Practical Example</h4>
+                        ${marked.parse(data.example)}
+                    `;
+                    speechControls.style.display = 'flex';
+                    speakText(data.example);
+                } else {
+                    professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (err) {
+                professorResponse.innerHTML = `<div class="error">Failed to get example. Please make sure the backend is running.</div>`;
+            }
+        });
+    
+        summarizeBtn.addEventListener("click", async () => {
+            if (!currentTopic) {
+                professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
+                professorResponse.style.display = 'block';
+                return;
+            }
+    
+            professorResponse.style.display = 'block';
+            professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is preparing a summary...</p>";
+            animateProfessor("thinking");
+    
+            try {
+                const res = await fetch("/summarize_topic", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic: currentTopic })
+                });
+    
+                const data = await res.json();
+                if (data.summary) {
+                    professorResponse.innerHTML = `
+                        <h4>📝 Summary of ${currentTopic}</h4>
+                        ${marked.parse(data.summary)}
+                    `;
+                    speechControls.style.display = 'flex';
+                    speakText(data.summary);
+                } else {
+                    professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (err) {
+                professorResponse.innerHTML = `<div class="error">Failed to get summary. Please make sure the backend is running.</div>`;
+            }
+        });
+    
+        videoLessonBtn.addEventListener("click", async () => {
+            if (!currentTopic) {
+                professorResponse.innerHTML = `<div class="error">Please generate a course first</div>`;
+                professorResponse.style.display = 'block';
+                return;
+            }
+    
+            const moduleName = prompt("Which module would you like a video lesson for?");
+            if (!moduleName) return;
+    
+            professorResponse.style.display = 'block';
+            professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Searching for relevant video lessons...</p>";
+            animateProfessor("explaining");
+    
+            try {
+                // First, try to get AI-generated lesson content
+                const lessonRes = await fetch("/get_video_lectures", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        topic: currentTopic,
+                        module: moduleName 
+                    })
+                });
+    
+                const lessonData = await lessonRes.json();
+                
+                let videosHtml = '';
+                
+                if (lessonData.videos && lessonData.videos.length > 0 && !lessonData.videos.error) {
+                    // Use YouTube API results
+                    videosHtml = '<h4>🎥 Recommended Video Lectures</h4>';
+                    lessonData.videos.forEach((video, index) => {
+                        videosHtml += `
+                            <div class="video-container mb-3 p-3 bg-light rounded">
+                                <h5>${index + 1}. ${video.title}</h5>
+                                <p class="text-muted mb-2">Channel: ${video.channel}</p>
+                                <div class="ratio ratio-16x9">
+                                    <iframe 
+                                        src="${video.embed_url}" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <p class="mt-2 small">${video.description.substring(0, 200)}...</p>
+                                <a href="${video.watch_url || video.embed_url.replace('embed/', 'watch?v=')}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                    <i class="fab fa-youtube"></i> Watch on YouTube
+                                </a>
+                            </div>
+                        `;
+                    });
+                } else {
+                    // Fallback: Use topic-related educational videos from reliable sources
+                    const fallbackVideos = getFallbackVideos(currentTopic, moduleName);
+                    videosHtml = '<h4>🎥 Curated Educational Videos</h4>';
+                    
+                    fallbackVideos.forEach((video, index) => {
+                        videosHtml += `
+                            <div class="video-container mb-3 p-3 bg-light rounded">
+                                <h5>${index + 1}. ${video.title}</h5>
+                                <p class="text-muted mb-2">Source: ${video.channel}</p>
+                                <div class="ratio ratio-16x9">
+                                    <iframe 
+                                        src="${video.embed_url}" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <p class="mt-2 small">${video.description}</p>
+                                <a href="${video.url}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                    <i class="fab fa-youtube"></i> Watch Full Video
+                                </a>
+                            </div>
+                        `;
+                    });
+                    
+                    videosHtml += `
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Pro Tip:</strong> For more specific content, search YouTube for: 
+                            "<em>${currentTopic} ${moduleName} tutorial 2024</em>"
+                        </div>
+                    `;
+                }
+                
+                // Add AI-generated learning guidance
+                try {
+                    const guidanceRes = await fetch("/explain_concept", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ topic: `${currentTopic} - ${moduleName}` })
+                    });
+                    
+                    const guidanceData = await guidanceRes.json();
+                    if (guidanceData.explanation) {
+                        videosHtml += `
+                            <div class="mt-4 p-3 bg-primary text-white rounded">
+                                <h5>📚 Learning Guide for ${moduleName}</h5>
+                                ${marked.parse(guidanceData.explanation.substring(0, 300) + '...')}
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-light" onclick="document.getElementById('explainBtn').click()">
+                                        Get Detailed Explanation
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (guidanceErr) {
+                    // Silently fail if guidance doesn't work
+                    console.log("Guidance feature unavailable");
+                }
+                
+                professorResponse.innerHTML = videosHtml;
+                
+            } catch (err) {
+                // Ultimate fallback with curated educational content
+                professorResponse.innerHTML = getEducationalContentFallback(currentTopic, moduleName);
+            }
+        });
+    
+        speakBtn.addEventListener("click", () => {
+            const responseText = professorResponse.innerText || professorResponse.textContent;
+            if (responseText && responseText !== "Thinking..." && !responseText.includes("Error")) {
+                speakText(responseText);
+            }
+        });
+    
+        stopBtn.addEventListener("click", stopSpeech);
+    
+        generateBtn.addEventListener("click", async () => {
+            const topic = topicInput.value.trim();
+            if (!topic) {
+                resultDiv.innerHTML = `<div class="error">⚠️ Please enter a topic</div>`;
+                return;
+            }
+    
+            currentTopic = topic;
+            generateBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+    
+            try {
+                const res = await fetch("/generate_course", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic })
+                });
+    
+                const data = await res.json();
+                if (data.course) {
+                    resultDiv.innerHTML = `<h3 class="text-primary">Your ${topic} Course</h3>${marked.parse(data.course)}`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">Failed to connect to backend. Please make sure the Flask server is running.</div>`;
+            } finally {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                generateBtn.disabled = false;
+            }
+        });
+    
+        topicInput.addEventListener("keypress", e => {
+            if (e.key === "Enter") generateBtn.click();
+        });
+    
+        askBtn.addEventListener("click", async () => {
+            const question = questionInput.value.trim();
+            if (!question) return;
+    
+            professorResponse.style.display = 'block';
+            professorResponse.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Professor is thinking...</p>";
+            speechControls.style.display = 'none';
+            animateProfessor("thinking");
+    
+            try {
+                const res = await fetch("/ask_professor", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question })
+                });
+    
+                const data = await res.json();
+                if (data.answer) {
+                    professorResponse.innerHTML = marked.parse(data.answer);
+                    speechControls.style.display = 'flex';
+                } else {
+                    professorResponse.innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (err) {
+                professorResponse.innerHTML = `<div class="error">Failed to get professor's response. Please check if the backend is running.</div>`;
+            }
+        });
+    
+        questionInput.addEventListener("keypress", e => {
+            if (e.key === "Enter") askBtn.click();
+        });
+    
+        generateAssessmentBtn.addEventListener("click", async () => {
+            currentModule = document.getElementById("moduleName").value.trim();
+            const topic = document.getElementById("topic").value.trim();
+            
+            if (!currentModule || !topic) {
+                assessmentResult.innerHTML = `<div class="error">Please enter both topic and module name</div>`;
+                assessmentResult.style.display = 'block';
+                return;
+            }
+    
+            generateAssessmentBtn.disabled = true;
+            assessmentResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Generating assessment...</p>";
+            assessmentResult.style.display = 'block';
+    
+            try {
+                const res = await fetch("/generate_assessment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        topic: topic, 
+                        module: currentModule,
+                        student_id: "student_001"
+                    })
+                });
+    
+                const data = await res.json();
+                if (data.assessment) {
+                    assessmentResult.innerHTML = `
+                        <h4>📋 ${currentModule} Assessment</h4>
+                        ${marked.parse(data.assessment)}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i> Complete this assessment and submit your work below.
+                        </div>
+                    `;
+                    submissionArea.style.display = 'block';
+                } else {
+                    assessmentResult.innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (err) {
+                assessmentResult.innerHTML = `<div class="error">Failed to generate assessment. Please check backend connection.</div>`;
+            } finally {
+                generateAssessmentBtn.disabled = false;
+            }
+        });
+    
+        submitAssessmentBtn.addEventListener("click", async () => {
+            const submission = document.getElementById("submissionText").value.trim();
+            
+            if (!submission) {
+                alert("Please provide your submission first");
+                return;
+            }
+    
+            submitAssessmentBtn.disabled = true;
+            evaluationResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Submitting and evaluating...</p>";
+            evaluationResult.style.display = 'block';
+    
+            try {
+                // First submit the assessment
+                const submitRes = await fetch("/submit_assessment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        module: currentModule,
+                        submission: submission,
+                        student_id: "student_001"
+                    })
+                });
+    
+                const submitData = await submitRes.json();
+                
+                if (submitData.status === "submitted") {
+                    // Then evaluate it
+                    const evalRes = await fetch("/evaluate_assessment", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            module: currentModule,
+                            student_id: "student_001"
+                        })
+                    });
+    
+                    const evalData = await evalRes.json();
+                    if (evalData.feedback) {
+                        evaluationResult.innerHTML = `
+                            <h4>🎯 Professor's Evaluation</h4>
+                            ${marked.parse(evalData.feedback)}
+                            <div class="mt-3 success">
+                                <i class="fas fa-check-circle"></i> Module "${currentModule}" marked as completed!
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-success" onclick="document.getElementById('checkProgressBtn').click()">
+                                    <i class="fas fa-chart-line"></i> Check Updated Progress
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        evaluationResult.innerHTML = `<div class="error">Evaluation failed: ${evalData.error}</div>`;
+                    }
+                } else {
+                    evaluationResult.innerHTML = `<div class="error">Submission failed: ${submitData.error}</div>`;
+                }
+            } catch (err) {
+                evaluationResult.innerHTML = `<div class="error">Submission failed. Please check backend connection.</div>`;
+            } finally {
+                submitAssessmentBtn.disabled = false;
+            }
+        });
+    
+        checkProgressBtn.addEventListener("click", async () => {
+            checkProgressBtn.disabled = true;
+            progressResult.innerHTML = "<div class='loading-spinner'></div><p class='text-center'>Loading progress...</p>";
+    
+            try {
+                const res = await fetch("/get_progress", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ student_id: "student_001" })
+                });
+    
+                const data = await res.json();
+                if (data.progress) {
+                    const completed = data.progress.completed || [];
+                    const total = Object.keys(data.assessments || {}).length;
+                    const assessments = data.assessments || {};
+                    
+                    let modulesHtml = '';
+                    if (Object.keys(assessments).length > 0) {
+                        for (const [moduleName, assessment] of Object.entries(assessments)) {
+                            const status = assessment.status || 'assigned';
+                            const statusClass = `status-${status}`;
+                            modulesHtml += `
+                                <div class="module-status">
+                                    <span class="status-badge ${statusClass}">${status}</span>
+                                    <span>${moduleName}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    const progressPercentage = total > 0 ? Math.round(completed.length / total * 100) : 0;
+                    
+                    progressResult.innerHTML = `
+                        <h5>📈 Learning Progress Overview</h5>
+                        <div class="progress mb-4" style="height: 30px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: ${progressPercentage}%">
+                                ${completed.length}/${total} modules completed (${progressPercentage}%)
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>📋 Module Status</h6>
+                                ${modulesHtml || '<p class="text-muted">No assessments generated yet</p>'}
+                            </div>
+                            <div class="col-md-6">
+                                <h6>✅ Completed Modules</h6>
+                                <div class="completed-modules">
+                                    ${completed.length > 0 ? 
+                                        completed.map(module => `<div class="module-status"><span class="status-badge status-completed">completed</span><span>${module}</span></div>`).join('') : 
+                                        '<p class="text-muted">Complete assessments to see progress here!</p>'
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${completed.length > 0 ? `
+                            <div class="mt-3 alert alert-success">
+                                <i class="fas fa-trophy"></i> Great job! You've completed ${completed.length} module${completed.length > 1 ? 's' : ''}.
+                                ${total > completed.length ? `Keep going - ${total - completed.length} more to complete!` : 'Course completed! 🎉'}
+                            </div>
+                        ` : ''}
+                    `;
+                } else {
+                    progressResult.innerHTML = `<div class="error">No progress data found. Generate a course and complete assessments to track progress.</div>`;
+                }
+            } catch (err) {
+                progressResult.innerHTML = `<div class="error">Failed to load progress. Please check backend connection.</div>`;
+            } finally {
+                checkProgressBtn.disabled = false;
+            }
+        });
     });
-  </script>
+    
+    window.addEventListener('beforeunload', () => {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && isSpeaking) {
+            e.preventDefault();
+            stopSpeech();
+        }
+    });
+    </script>
+    
+  
+
 </body>
 </html>
