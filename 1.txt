@@ -1019,7 +1019,7 @@ def get_progress():
             return jsonify({"progress": {"completed": [], "in_progress": []}, "assessments": {}})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+evie lee
 # Health check endpoint
 @app.route("/health", methods=["GET"])
 def health_check():
