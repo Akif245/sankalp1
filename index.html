@@ -2068,7 +2068,7 @@
                     const progressPercentage = total > 0 ? Math.round(completed.length / total * 100) : 0;
                     
                     progressResult.innerHTML = `
-                        <h5>📈 Learning Progress Overview</h5>
+                        <h5>Learning Progress Overview</h5>
                         <div class="progress mb-4" style="height: 30px;">
                             <div class="progress-bar" role="progressbar" 
                                  style="width: ${progressPercentage}%">
@@ -2078,11 +2078,11 @@
                         
                         <div class="row">
                             <div class="col-md-6">
-                                <h6>📋 Module Status</h6>
+                                <h6> Module Status</h6>
                                 ${modulesHtml || '<p class="text-muted">No assessments generated yet</p>'}
                             </div>
                             <div class="col-md-6">
-                                <h6>✅ Completed Modules</h6>
+                                <h6> Completed Modules</h6>
                                 <div class="completed-modules">
                                     ${completed.length > 0 ? 
                                         completed.map(module => `<div class="module-status"><span class="status-badge status-completed">completed</span><span>${module}</span></div>`).join('') : 
