@@ -17,7 +17,6 @@ YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 # In-memory storage for assessments (replace with database in production)
 student_assessments = {}
-
 def call_ai_api(prompt, system_message=None):
     """Call AI API with the given prompt (using OpenRouter)"""
     headers = {
@@ -33,7 +32,7 @@ def call_ai_api(prompt, system_message=None):
     messages.append({"role": "user", "content": prompt})
     
     payload = {
-        "model": "deepseek/deepseek-chat",
+        "model": "meta-llama/llama-3-8b-instruct",  # ✅ free model
         "messages": messages,
         "temperature": 0.7,
         "max_tokens": 2048
@@ -47,55 +46,6 @@ def call_ai_api(prompt, system_message=None):
     except Exception as e:
         return f"AI API temporarily unavailable. Error: {str(e)}"
 
-
-def search_youtube_videos(query, max_results=5):
-    """Search for educational videos on YouTube with better query formatting"""
-    if not YOUTUBE_API_KEY:
-        return {"error": "YouTube API key not configured"}
-    
-    try:
-        # Better query formatting for educational content
-        formatted_query = f"{query} tutorial course education learn how to"
-        
-        # YouTube API endpoint
-        url = f"https://www.googleapis.com/youtube/v3/search"
-        params = {
-            'part': 'snippet',
-            'maxResults': max_results,
-            'q': formatted_query,
-            'type': 'video',
-            'key': YOUTUBE_API_KEY,
-            'relevanceLanguage': 'en',
-            'videoDuration': 'medium',  # Prefer medium-length videos (4-20 minutes)
-            'videoEmbeddable': 'true'   # Only embeddable videos
-        }
-        
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        
-        videos = []
-        for item in data.get('items', []):
-            video_id = item['id']['videoId']
-            title = item['snippet']['title']
-            channel = item['snippet']['channelTitle']
-            description = item['snippet']['description']
-            thumbnail = item['snippet']['thumbnails']['high']['url']
-            
-            videos.append({
-                'video_id': video_id,
-                'title': title,
-                'channel': channel,
-                'description': description,
-                'thumbnail': thumbnail,
-                'embed_url': f"https://www.youtube.com/embed/{video_id}",
-                'watch_url': f"https://www.youtube.com/watch?v={video_id}"
-            })
-        
-        return videos
-    except Exception as e:
-        print(f"YouTube API error: {str(e)}")
-        return {"error": f"YouTube API temporarily unavailable: {str(e)}"}
 
 # Serve index.html
 @app.route("/")
